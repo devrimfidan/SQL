@@ -116,9 +116,88 @@ CREATE TABLE city (
 );
 ```
 
+
+## 4. Advanced Queries
+
+### 4.1 Join Query: Show City, State, and School
+```sql
+SELECT c.name AS city_name, s.name AS state_name, sch.name AS school_name
+FROM school sch
+JOIN state s ON sch.state_id = s.id
+JOIN city c ON s.city_id = c.id;
+```
+
+### 4.2 Count the Number of Schools per State
+```sql
+SELECT s.name AS state_name, COUNT(sch.id) AS total_schools
+FROM school sch
+JOIN state s ON sch.state_id = s.id
+GROUP BY s.name
+ORDER BY total_schools DESC;
+```
+
+### 4.3 Find Cities with No Schools
+```sql
+SELECT c.name AS city_name
+FROM city c
+LEFT JOIN state s ON c.id = s.city_id
+LEFT JOIN school sch ON s.id = sch.state_id
+WHERE sch.id IS NULL;
+```
+
+### 4.4 Find the State with the Most Schools
+```sql
+SELECT s.name AS state_name, COUNT(sch.id) AS school_count
+FROM school sch
+JOIN state s ON sch.state_id = s.id
+GROUP BY s.name
+ORDER BY school_count DESC
+LIMIT 1;
+```
+
+### 4.5 Retrieve Schools in a Specific City (e.g., Edirne)
+```sql
+SELECT sch.name AS school_name
+FROM school sch
+JOIN state s ON sch.state_id = s.id
+JOIN city c ON s.city_id = c.id
+WHERE c.name = 'Edirne';
+```
+
 ---
+
+## 5. Reporting Queries
+
+### 5.1 Generate a Report of Schools Grouped by City and State
+```sql
+SELECT c.name AS city_name, s.name AS state_name, COUNT(sch.id) AS total_schools
+FROM school sch
+JOIN state s ON sch.state_id = s.id
+JOIN city c ON s.city_id = c.id
+GROUP BY c.name, s.name
+ORDER BY c.name, total_schools DESC;
+```
+
+### 5.2 Find Cities with More Than 5 Schools
+```sql
+SELECT c.name AS city_name, COUNT(sch.id) AS school_count
+FROM school sch
+JOIN state s ON sch.state_id = s.id
+JOIN city c ON s.city_id = c.id
+GROUP BY c.name
+HAVING COUNT(sch.id) > 5;
+```
+
+### 5.3 Monthly School Registration Report
+```sql
+SELECT TO_CHAR(created_at, 'YYYY-MM') AS registration_month, COUNT(id) AS total_schools
+FROM school
+GROUP BY registration_month
+ORDER BY registration_month;
+```
+(Note: Requires `created_at` column in the `school` table)
+
+---
+
 ## 6. Conclusion
-This guide introduces PostgreSQL basics, covering table creation, inserting data, and writing queries. You can extend it further by adding more relationships or queries!
-
-Happy coding! 🚀
-
+This guide provides essential SQL queries to interact with PostgreSQL databases using a structured approach. The advanced and reporting queries help generate useful insights from the data. Happy querying! 🚀
